@@ -13,7 +13,7 @@ def main():
     if params.run_name != 'test_dump':
         if params.prune:
             params.run_name = f"{params.run_name}_pruneS-T_{params.prune_step}-{params.target_sparsity}"
-        config_name = f"{params.run_name}_{params.model}_{params.skip_connections}_{params.loss}_predS{params.predictor_size}_{params.batch_size}_{params.lr}"
+        config_name = f"{params.run_name}_{params.model}_{params.skip_connections}_{params.loss}_predS{params.predictor_size}_{params.batch_size}_{params.lr}_{params.lr_gamma}"
         print(config_name)
     else:
         config_name = 'test_dump'

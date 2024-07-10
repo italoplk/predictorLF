@@ -12,7 +12,7 @@ from skimage.measure import shannon_entropy
 from torchsummary import summary
 from DataSet import DataSet, LensletBlockedReferencer
 from prune import get_model_unstructured_sparsity
-
+from prune import architecture_stat
 import LightField as LF
 from customLearningRateScaler import CustomExpLr as lrScaler
 from customLosses import CustomLoss
@@ -136,26 +136,44 @@ class Trainer:
         parameters_to_prune = []
         for name, module in self.model.named_modules():
             if isinstance(module, torch.nn.Conv2d):
-                parameters_to_prune.append((module, "weight"))
+                if params.prune =="unstructured":
+                    parameters_to_prune.append((module, "weight"))
+                           
+                elif params.prune == "l1struct":
+                    parameters_to_prune.append((module))
+                   
 
         self.total_weights, self.pruned_weights,  self.sparsity=get_model_unstructured_sparsity(self.model)
-        
+       
         epoch = 0
         self.prune_count = 0
         while self.sparsity < params.target_sparsity:
-            if  params.prune == True and (epoch >= 1 or params.resume != ''):
+            if  params.prune != None and (epoch >= 1 or params.resume != ''):
 
                 if params.wandb_active and  self.prune_count != 0:
                     wandb.log({f"Prune Step": self.prune_count}, commit=False)
                     wandb.log({f"# of Weights": self.total_weights-self.pruned_weights},commit=False)
                     wandb.log({f"Sparsity": self.sparsity}, commit=False)
                     wandb.log({f"Loss_Sparsity": loss}, commit=False)
-            
-                prune.global_unstructured(
-                    parameters=parameters_to_prune,
-                    pruning_method=prune.L1Unstructured,
-                    amount=params.prune_step,
-                )
+                
+                if params.prune == "unstructured":
+                    prune.global_unstructured(
+                        parameters=parameters_to_prune,
+                        pruning_method=prune.L1Unstructured,
+                        amount=params.prune_step,
+                    )
+
+                elif params.prune == "l1struct":
+                        for module in parameters_to_prune[1:]:
+                            
+                            prune.ln_structured(
+                                module=module,
+                                name="weight",
+                                dim=0,
+                                n=float('-inf'),
+                                amount=params.prune_step,
+                        )
+
                 self.total_weights, self.pruned_weights, self.sparsity = get_model_unstructured_sparsity(self.model)
                 self.prune_count += 1
                 print("Prune step:", self.prune_count, "Total Weights:",self.total_weights,

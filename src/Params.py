@@ -84,7 +84,7 @@ def get_args():
     parser.add_argument('--skip-connections',  default='noSkip', type=str)
 
     
-    parser.add_argument('--prune', dest='prune', action='store_true')
+    parser.add_argument('--prune', default=None, type=str)
     parser.add_argument('--target-sparsity',  default=0.90, type=float)
     parser.add_argument('--prune-step',  default=0.0, type=float)
 

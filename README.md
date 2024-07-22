@@ -52,14 +52,6 @@
 
   The validation file names are hardcoded at the Dataset.py. While back a function "random_split" was coded to randomly pick the validation cases. Since we don't use such approach, it may be currently buggy.
 
-**For quick tests:**
-
-  --limit-train: Sets a limited number of light fields to train. (-1 to use all available)
-  
-  --limit-val: Sets a limited number of light fields to validate. (-1 to use all available)
-
-  --no-wandb: Deactivates the wandb logging. (Recommended only for quick testes and debbuging)
-
 
 **To prune:**
 
@@ -68,6 +60,15 @@
     --target-sparsity: Final model sparsity
     
     --prune-step: How many parameters to prune each step
+
+    
+**For quick tests:**
+
+  --limit-train: Sets a limited number of light fields to train. (-1 to use all available)
+  
+  --limit-val: Sets a limited number of light fields to validate. (-1 to use all available)
+
+  --no-wandb: Deactivates the wandb logging. (Recommended only for quick testes and debbuging)
 
 **Example For Quick Test:**
 

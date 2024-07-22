@@ -28,7 +28,7 @@
 **To resume a training:**
   --resume-epoch: To restart training a model from a given epoch
   --resume: Model (.tar) to have its training resumed
-**
+
 **WARNING:****
   The validation file names are hardcoded at the Dataset.py. While back a function "random_split" was coded to randomly pick the validation cases. Since we don't use such approach, it may be currently buggy.
 

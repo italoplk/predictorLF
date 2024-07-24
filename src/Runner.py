@@ -10,23 +10,35 @@ import os
 def main():
     params = get_args()
 
+    os.makedirs(f"{params.std_path}/saved_models/", exist_ok=True)
+    os.makedirs(f"{params.std_path}/saved_models/pruned", exist_ok=True)
+    os.makedirs(f"{params.std_path}/saved_models/unpruned", exist_ok=True)
+        
+        
+
     if params.run_name != 'test_dump':
+
         if params.prune:
             params.run_name = f"{params.run_name}_pruneS-T_{params.prune_step}-{params.target_sparsity}"
-        config_name = f"{params.run_name}_{params.model}_{params.skip_connections}_{params.loss}_predS{params.predictor_size}_{params.batch_size}_{params.lr}_{params.lr_gamma}"
+        config_name = f"{params.run_name}_{params.model}_{params.skip_connections}_{params.loss}_predS{params.predictor_size}_{params.batch_size}_{params.lr}_G{params.lr_gamma}"
         print(config_name)
     else:
         config_name = 'test_dump'
    
     try:
-    
-        os.mkdir(f"{params.std_path}/saved_LFs/{config_name}")
-        os.mkdir(f"{params.std_path}/saved_LFs/{config_name}/validation/")
-        os.mkdir(f"{params.std_path}/saved_models/{config_name}")
+        if params.prune:
+            os.mkdir(f"{params.std_path}/saved_models/pruned/{config_name}")
+        else:
+            os.mkdir(f"{params.std_path}/saved_models/unpruned/{config_name}")
 
             
+        if params.save_test:
+            os.mkdir(f"{params.std_path}/saved_LFs/{config_name}")
+            os.mkdir(f"{params.std_path}/saved_LFs/{config_name}/validation/")
         if params.save_train:
+            os.mkdir(f"{params.std_path}/saved_LFs/{config_name}")
             os.mkdir(f"{params.std_path}/saved_LFs/{config_name}/train/")
+
     except FileExistsError:
         print("Using Existent folder!!")
 

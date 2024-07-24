@@ -1,6 +1,26 @@
 from torch import nn
 import torch
+import torch.nn.utils.prune as prune
 
+class FilterPruning(prune.BasePruningMethod):
+    PRUNING_TYPE = "structured"
+
+    def __init__(self, amount):
+        super().__init__()
+        self.amount = amount
+
+    def compute_mask(self, t, default_mask):
+        # t is the tensor of the weights of the layer
+        # Compute the L2 norm of each filter
+        filter_norms = t.view(t.size(0), -1).norm(dim=1)
+        # Get the indices of the filters with the lowest norms
+        num_filters_to_prune = int(self.amount * t.size(0))
+        prune_indices = torch.topk(filter_norms, num_filters_to_prune, largest=False).indices
+        # Create a mask with 1s for the filters to keep and 0s for the filters to prune
+        mask = torch.ones_like(t)
+        mask[prune_indices] = 0
+        return mask
+    
 def get_model_unstructured_sparsity(model):
     total = []
     pruned = []

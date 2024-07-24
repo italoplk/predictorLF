@@ -19,18 +19,8 @@ class RegModel(nn.Module):
 
     def forward(self, X):
         for i,enc in enumerate(self.encoder):
-            # print(f'enc {i}: {X.shape}')
             X = enc(X)
-            # print(f'output {X.shape}\n')
-        # print('-----')
-        # print("enc2", X.shape)
-
+            
         for i, (dec) in enumerate(self.decoder):
-            # print(f'dec {i}: {X.shape}')
             X = dec(X)
-            # print(f'output {X.shape}\n')
-        # print(X)
-
-        #     print("shape", s)
-        # X = self.decoder[-1](X)
         return X

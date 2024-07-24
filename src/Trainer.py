@@ -83,7 +83,11 @@ class Trainer:
             device = torch.device("cpu")
         
         self.model.eval()
-        with open(f"{self.params.std_path}/saved_models/{config_name}/networksummary_{config_name}.txt", "w+") as out:
+
+        if self.params.prune:   folder = "pruned"
+        else:                   folder = "unpruned"
+
+        with open(f"{self.params.std_path}/saved_models/{folder}/{config_name}/networksummary_{config_name}.txt", "w+") as out:
 
             if self.model_name == 'sepBlocks' or self.model_name == 'zhong':
                 summary(self.model, (3, 32, 32))
@@ -148,7 +152,7 @@ class Trainer:
         epoch = 0
         self.prune_count = 0
         while self.sparsity < params.target_sparsity:
-            if  params.prune != None and (epoch >= 1 or params.resume != ''):
+            if  params.prune != None and ((params.resume_epoch == 1 and params.resume != '') or epoch == params.epochs):
 
                 if params.wandb_active and  self.prune_count != 0:
                     wandb.log({f"Prune Step": self.prune_count}, commit=False)
@@ -164,15 +168,14 @@ class Trainer:
                     )
 
                 elif params.prune == "l1struct":
-                        for module in parameters_to_prune[1:]:
-                            
+                        for module in parameters_to_prune:
                             prune.ln_structured(
                                 module=module,
                                 name="weight",
                                 dim=0,
                                 n=float('-inf'),
                                 amount=params.prune_step,
-                        )
+                            )
 
                 self.total_weights, self.pruned_weights, self.sparsity = get_model_unstructured_sparsity(self.model)
                 self.prune_count += 1
@@ -232,16 +235,16 @@ class Trainer:
 
                 if params.run_name != "test_dump":
                     if loss < self.best_loss:
-                        torch.save(check, f"{self.params.std_path}/saved_models/{config_name}/bestMSE_{config_name}.pth.tar")
+                        torch.save(check, f"{self.params.std_path}/saved_models/{folder}/{config_name}/bestMSE_{config_name}.pth.tar")
                         self.best_loss = loss
                     if entropy < self.best_entropy:
-                        torch.save(check, f"{self.params.std_path}/saved_models/{config_name}/bestEntropy_{config_name}.pth.tar")
+                        torch.save(check, f"{self.params.std_path}/saved_models/{folder}/{config_name}/bestEntropy_{config_name}.pth.tar")
                         self.best_entropy = entropy
 
                 if params.prune:
-                    torch.save(check, f"{self.params.std_path}/saved_models/{config_name}/{config_name}_{self.prune_count}.pth.tar")
+                    torch.save(check, f"{self.params.std_path}/saved_models/{folder}/{config_name}/{config_name}_{self.prune_count}.pth.tar")
                 else:
-                    torch.save(check, f"{self.params.std_path}/saved_models/{config_name}/{config_name}_{epoch}.pth.tar")
+                    torch.save(check, f"{self.params.std_path}/saved_models/{folder}/{config_name}/{config_name}_{epoch}.pth.tar")
 
     def train(self, current_epoch, val, wandb_active):
 
@@ -298,7 +301,7 @@ class Trainer:
                     predicted = predicted[:, :, -self.predictor_size_v:, -self.predictor_size_h:]
                 
 
-                if (val == 1) or (self.params.save_train == True):
+                if (self.params.save_test == True and val == 1) or (self.params.save_train == True):
                     cpu_pred = predicted.cpu().detach()
                     cpu_orig = actual_block.cpu().detach()
                     cpu_ref = neighborhood.cpu().detach()
@@ -440,6 +443,24 @@ class ModelOracle:
             from Models.GDN_4layers import GDN4l_NN
             self.model = GDN4l_NN
             print("GDN4l_NN")
+        elif model_name == 'noConvTrans':
+            from Models.gabriele_k3_noConvTransposed import NNmodel
+            self.model = NNmodel
+        elif model_name == 'noConvTransNoLL':
+            from Models.gabriele_k3_noConvTransposedNoLL import NNmodel
+            self.model = NNmodel
+            print("No Conv Transposed Decoder")
+        elif model_name == 'convTrans':
+            from Models.gabriele_k3_allTransposed import NNmodel
+            self.model = NNmodel
+            print("All Conv Transposed Decoder")
+        elif model_name == 'convTransNoLL':
+            from Models.gabriele_k3_allTransposedNOLL import NNmodel
+            self.model = NNmodel
+            print("All Conv Transposed Dec. No Last Layer")
+            
+            
+
         else:
             print("Model not Found.")
             exit(404)

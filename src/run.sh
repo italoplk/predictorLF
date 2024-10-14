@@ -20,3 +20,6 @@ python3 Runner.py  --loss satd --transforms 3 --epochs 200 --predictor-size 8 --
 #python3 Runner.py --no-wandb --limit-train 1 --limit-val 1  --std-path /home/machado --dataset-path /home/machado/New_Extracted_Dataset/EPFL/Lenslet_8x8_Gscale --test-path /home/machado/New_Extracted_Dataset/EPFL/Lenslet_8x8_Gscale --model zhong
 python3 Runner.py  --loss satd --transforms 3 --epochs 100 --predictor-size 8 --context-size 16 --run-name context16
 python3 Runner.py  --loss satd --transforms 3 --epochs 120 --resume  /home/machado/scratch/saved_models/transforms8_Unet3k_satd_predS8_64_0.0001/transforms8_Unet3k_satd_predS8_64_0.0001_90.pth.tar --resume-epoch 90 --predictor-size 8 --context-size 16 --run-name context16refined32
+
+#example submit on Hssh
+ WANDB_API_KEY=9a53bad34073a4b6bcfa6c2cb67a857e976d86c4  submit --name Structprunning32x32005  gitlab.di.unito.it:5000/dombrowski/eidos-base-pytorch:1.12.0 Runner.py --transforms 3 --epochs 100 --run-name StructPruning8v --prune l1struct --target-sparsity 90 --prune-step 0.05 --resume /scratch/saved_models/schedulerGamma0.3_Unet3k_noSkip_satd_predS32_64_0.0001/schedulerGamma0.3_Unet3k_noSkip_satd_predS32_64_0.0001_100.pth.tar --dataset-path /scratch/DataSets/Lenslet_16x16_Gscale/

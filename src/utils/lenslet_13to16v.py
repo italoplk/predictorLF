@@ -87,11 +87,11 @@ def thirteen2sixteenViews(png_file_path, output_image_path):
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-ds_path = '/home/machado/New_Extracted_Dataset/EPFL/MultiView_RGB/'
-output_path = '/home/machado/New_Extracted_Dataset/Multiview_16x16/'
+ds_path = '/home/machado/Iris/MultiView_RGB/'
+output_path = '/home/machado/Multiview_16x16/'
 #for rearange
-pathOut="/home/machado/New_Extracted_Dataset/Lenslet_16x16_RGB/"
-pathOutg='/home/machado/New_Extracted_Dataset/Lenslet_16x16_Gscale/'
+pathOut="/home/machado/Iris/Lenslet_16x16_RGB/"
+pathOutg='/home/machado/Iris/Lenslet_16x16_Gscale/'
 
 for classe in os.listdir(ds_path):
     classe_out = os.path.join(output_path,classe)

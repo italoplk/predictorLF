@@ -32,13 +32,13 @@ class Trainer:
         self.best_loss = 100000.1
         self.best_entropy = 1000.1
 
-        if self.params.loss == 'mse':
+        if self.params.loss == 'MSE':
             self.loss = nn.MSELoss()
             print("Using MSE")
-        elif self.params.loss == 'sad':
+        elif self.params.loss == 'SAD':
             self.loss = SAD()
             print("Using SAD")
-        elif self.params.loss == 'satd' or self.params.loss == 'dct':
+        elif self.params.loss == 'SATD' or self.params.loss == 'dct':
             self.loss = CustomLoss(self.params.loss, self.params.quantization, self.params.denormalize_loss,  self.predictor_size_v)
             print("Using Custom Loss ", self.params.loss)
         else:
